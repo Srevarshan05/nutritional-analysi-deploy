@@ -1,0 +1,19 @@
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.dll
+*.so
+Lib/
+site-packages/
+test/
+static/uploads/*
+venv/
+env/
+# Ignore large binary files
+*.dll
+*.pyd
+
+# Ignore specific large folders or files
+test/Lib/site-packages/paddle/
+test/Lib/site-packages/cv2/

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutritional & Medical Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #e0f7e9; color: #2e7d32; }
+        .btn-custom { background-color: #66bb6a; color: white; }
+        .section-title { font-size: 1.5rem; font-weight: bold; text-align: center; }
+        #imageDisplay { max-width: 100%; height: auto; border: 2px dashed #2e7d32; }
+        textarea { font-size: 1rem; resize: vertical; }
+        .container { max-width: 1200px; }
+        .loading { display: none; text-align: center; margin-top: 10px; }
+        @media (max-width: 768px) {
+            .section-title { font-size: 1.2rem; }
+            textarea { height: 150px; }
+            #imageDisplay { max-height: 300px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4" style="font-size: 2rem; font-weight: bold;">Nutritional & Medical Analysis Tool</h1>
+        
+        <div class="row">
+            <!-- Nutritional Section -->
+            <div class="col-md-6 mb-4">
+                <h2 class="section-title">Nutritional Data</h2>
+                <input type="file" id="nutritionalFile" class="form-control mb-2" accept="image/*">
+                <button class="btn btn-custom w-100 mb-2" onclick="uploadNutritional()">Upload Nutritional Image & Analyze</button>
+                <div class="loading" id="nutritionalLoading">Processing...</div>
+                <img id="imageDisplay" class="img-fluid mb-2" alt="Uploaded Nutritional Image">
+                <textarea id="nutritionalOutput" class="form-control" rows="5" placeholder="Nutritional Analysis Output"></textarea>
+            </div>
+            
+            <!-- Medical Section -->
+            <div class="col-md-6 mb-4">
+                <h2 class="section-title">Medical Report</h2>
+                <input type="file" id="medicalFile" class="form-control mb-2" accept="image/*">
+                <button class="btn btn-custom w-100 mb-2" onclick="uploadMedical()">Upload Medical Report & Analyze</button>
+                <div class="loading" id="medicalLoading">Processing...</div>
+                <textarea id="medicalOutput" class="form-control" rows="5" placeholder="Medical Report Analysis Output"></textarea>
+            </div>
+        </div>
+        
+        <!-- Combined Evaluation -->
+        <h2 class="section-title mt-4">Combined Evaluation</h2>
+        <div class="row mb-3">
+            <div class="col-md-6 mb-2">
+                <label for="modelSelect" class="form-label">Select Model:</label>
+                <select id="modelSelect" class="form-select">
+                    <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile</option>
+                    <option value="deepseek-r1-distill-llama-70b">deepseek-r1-distill-llama-70b</option>
+                    <option value="llama-3.2-1b-preview">llama-3.2-1b-preview</option>
+                    <option value="qwen-2.5-32b">qwen-2.5-32b</option>
+                </select>
+            </div>
+            <div class="col-md-6 mb-2">
+                <label for="languageSelect" class="form-label">Select Language:</label>
+                <select id="languageSelect" class="form-select">
+                    <option value="English">English</option>
+                    <option value="Tamil">Tamil</option>
+                    <option value="Hindi">Hindi</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-custom w-100 mb-2" onclick="evaluateCombined()">Evaluate Combined Data</button>
+        <div class="loading" id="combinedLoading">Processing...</div>
+    </div>
+
+    <!-- Modal for Combined Evaluation -->
+    <div class="modal fade" id="resultModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Combined Evaluation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea id="combinedOutput" class="form-control" rows="10" readonly></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-custom" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function uploadNutritional() {
+            const fileInput = document.getElementById('nutritionalFile');
+            const loading = document.getElementById('nutritionalLoading');
+            if (!fileInput.files[0]) {
+                alert("Please select a nutritional image first.");
+                return;
+            }
+            loading.style.display = 'block';
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            try {
+                const response = await fetch('/upload_nutritional', { method: 'POST', body: formData });
+                const data = await response.json();
+                loading.style.display = 'none';
+                if (!response.ok || data.error) {
+                    throw new Error(data.error || 'Unknown server error');
+                }
+                document.getElementById('nutritionalOutput').value = data.refined_text;
+                document.getElementById('imageDisplay').src = data.image_url;
+            } catch (e) {
+                loading.style.display = 'none';
+                alert(`Error: ${e.message}`);
+            }
+        }
+
+        async function uploadMedical() {
+            const fileInput = document.getElementById('medicalFile');
+            const loading = document.getElementById('medicalLoading');
+            if (!fileInput.files[0]) {
+                alert("Please select a medical report image first.");
+                return;
+            }
+            loading.style.display = 'block';
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            try {
+                const response = await fetch('/upload_medical', { method: 'POST', body: formData });
+                const data = await response.json();
+                loading.style.display = 'none';
+                if (!response.ok || data.error) {
+                    throw new Error(data.error || 'Unknown server error');
+                }
+                document.getElementById('medicalOutput').value = data.refined_text;
+            } catch (e) {
+                loading.style.display = 'none';
+                alert(`Error: ${e.message}`);
+            }
+        }
+
+        async function evaluateCombined() {
+            const nutritionalText = document.getElementById('nutritionalOutput').value;
+            const medicalText = document.getElementById('medicalOutput').value;
+            const model = document.getElementById('modelSelect').value;
+            const language = document.getElementById('languageSelect').value;
+            const loading = document.getElementById('combinedLoading');
+
+            if (!nutritionalText) {
+                alert("Please analyze nutritional data first.");
+                return;
+            }
+            if (!medicalText) {
+                alert("Please process medical report first.");
+                return;
+            }
+
+            loading.style.display = 'block';
+            try {
+                const response = await fetch('/evaluate_combined', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nutritional_text: nutritionalText, medical_text: medicalText, model, language })
+                });
+                const data = await response.json();
+                loading.style.display = 'none';
+                if (!response.ok || data.error) {
+                    throw new Error(data.error || 'Unknown server error');
+                }
+                document.getElementById('combinedOutput').value = data.result;
+                new bootstrap.Modal(document.getElementById('resultModal')).show();
+            } catch (e) {
+                loading.style.display = 'none';
+                alert(`Error: ${e.message}`);
+            }
+        }
+    </script>
+</body>
+</html>
