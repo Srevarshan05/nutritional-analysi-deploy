@@ -12,6 +12,19 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 
 app = Flask(__name__)
 
+# Load environment variables
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-secret-key-for-local')  # Flask security key
+GROQ_API_KEY = os.environ.get('GROQ_API_KEY')  # Groq API key from environment variable
+
+try:
+    if not GROQ_API_KEY:
+        raise ValueError("GROQ_API_KEY environment variable is not set")
+    client = Groq(api_key=GROQ_API_KEY)
+    logging.info("Groq client initialized successfully")
+except Exception as e:
+    logging.error(f"Failed to initialize Groq client: {str(e)}")
+    raise
+
 # Initialize OCR and Groq
 try:
     ocr = PaddleOCR(use_angle_cls=True, lang='en', use_gpu=False)
@@ -21,7 +34,9 @@ except Exception as e:
     raise
 
 try:
-    client = Groq(api_key="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")
+    if not GROQ_API_KEY:
+        raise ValueError("GROQ_API_KEY environment variable is not set")
+    client = Groq(api_key=GROQ_API_KEY)
     logging.info("Groq client initialized successfully")
 except Exception as e:
     logging.error(f"Failed to initialize Groq client: {str(e)}")
@@ -286,10 +301,12 @@ def evaluate_combined():
         logging.error(f"Evaluate combined error: {str(e)}")
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
-#if __name__ == "__main__":
-#    try:
-#        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-#        logging.info(f"Upload folder created/verified: {UPLOAD_FOLDER}")
-#        app.run(debug=True, host='0.0.0.0', port=5000)
-#    except Exception as e:
-#        logging.error(f"Startup error: {str(e)}")
+if __name__ == "__main__":
+    try:
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        logging.info(f"Upload folder created/verified: {UPLOAD_FOLDER}")
+        # Use environment variable PORT for Render, default to 5000 locally
+        port = int(os.environ.get('PORT', 5000))
+        app.run(debug=True, host='0.0.0.0', port=port)
+    except Exception as e:
+        logging.error(f"Startup error: {str(e)}")
