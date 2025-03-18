@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutritional & Medical Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6A82FB, #FC5C7D);
+            --secondary-gradient: linear-gradient(135deg, #00C4B4, #4CAF50);
+            --light-bg: #F0F4F8;
+            --light-text: #2C3E50;
+            --dark-bg: #1A1A2D;
+            --dark-text: #FFFFFF;
+            --card-bg-light: rgba(255, 255, 255, 0.95);
+            --card-bg-dark: rgba(42, 42, 60, 0.95);
+            --shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            --shade-effect: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            transition: var(--transition);
+            background: var(--light-bg);
+        }
+
+        body.light-mode {
+            background: linear-gradient(135deg, #E2E8F0 0%, #F0F4F8 100%);
+            color: var(--light-text);
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #1A1A2D 0%, #2A2A3C 100%);
+            color: var(--dark-text);
+        }
+
+        .container {
+            max-width: 1200px;
+            padding: 20px;
+        }
+
+        .card {
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            padding: 25px;
+            background: var(--card-bg-light);
+            transition: var(--transition);
+            backdrop-filter: blur(5px);
+        }
+
+        .dark-mode .card {
+            background: var(--card-bg-dark);
+        }
+
+        .btn-custom {
+            background: var(--secondary-gradient);
+            color: white;
+            border-radius: 30px;
+            padding: 12px 25px;
+            border: none;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 196, 180, 0.4);
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        textarea, .form-control, .form-select {
+            border-radius: 15px;
+            font-size: 1rem;
+            resize: vertical;
+            box-shadow: var(--shade-effect);
+            border: 1px solid #D1D5DB;
+            transition: var(--transition);
+        }
+
+        .dark-mode textarea, .dark-mode .form-control, .dark-mode .form-select {
+            background: #3A3A4E;
+            color: var(--dark-text);
+            border-color: #4A4A5E;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #FC5C7D;
+            font-weight: 600;
+            margin-top: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar {
+            padding: 15px 20px;
+            box-shadow: var(--shadow);
+            background: var(--card-bg-light);
+            border-radius: 0 0 20px 20px;
+        }
+
+        .dark-mode .navbar {
+            background: var(--card-bg-dark);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 25px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #D1D5DB;
+            transition: var(--transition);
+            border-radius: 25px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 19px;
+            width: 19px;
+            left: 3px;
+            bottom: 3px;
+            background: #FFFFFF;
+            transition: var(--transition);
+            border-radius: 50%;
+            box-shadow: var(--shade-effect);
+        }
+
+        input:checked + .slider {
+            background: var(--primary-gradient);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(25px);
+        }
+
+        .language-select-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 140px;
+        }
+
+        .language-select-wrapper .form-select {
+            padding-left: 35px;
+            background: var(--card-bg-light);
+            border-radius: 10px;
+        }
+
+        .dark-mode .language-select-wrapper .form-select {
+            background: #3A3A4E;
+        }
+
+        .language-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6A82FB;
+            pointer-events: none;
+        }
+
+        #imageDisplay {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            border: 3px dashed #6A82FB;
+            margin-bottom: 20px;
+            transition: var(--transition);
+            display: none; /* Hidden by default */
+        }
+
+        @media (max-width: 768px) {
+            .section-title { font-size: 1.3rem; }
+            textarea { height: 100px; }
+            #imageDisplay { max-height: 200px; }
+            .card { padding: 15px; }
+            .btn-custom { padding: 10px 20px; }
+            .navbar { padding: 10px 15px; }
+            .language-select-wrapper { width: 120px; }
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <!-- Navbar with Theme Toggle and Language Switcher -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <h1 class="navbar-brand mb-0 section-title" data-translate="title">NutriMinds AI</h1>
+            <div class="ms-auto d-flex align-items-center">
+                <div class="language-select-wrapper">
+                    <i class="bi bi-globe2 language-icon"></i>
+                    <select id="languageSelectNav" class="form-select me-3">
+                        <option value="English">English</option>
+                        <option value="Tamil">தமிழ்</option>
+                        <option value="Hindi">हिन्दी</option>
+                    </select>
+                </div>
+                <label class="toggle-switch me-3">
+                    <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Nutritional Section -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <h2 class="section-title" data-translate="nutritionalData">Nutritional Data</h2>
+                    <input type="file" id="nutritionalFile" class="form-control mb-2" accept="image/*">
+                    <button class="btn btn-custom w-100 mb-2" onclick="uploadNutritional()" data-translate="uploadNutritional">Upload Nutritional Image & Analyze</button>
+                    <div class="loading" id="nutritionalLoading" data-translate="processing">Processing...</div>
+                    <!-- Image will be added dynamically via JS -->
+                    <div id="imageContainer"></div>
+                    <textarea id="nutritionalOutput" class="form-control" rows="5" placeholder="Nutritional Analysis Output"></textarea>
+                </div>
+            </div>
+            
+            <!-- Medical Section -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <h2 class="section-title" data-translate="medicalReport">Medical Report</h2>
+                    <input type="file" id="medicalFile" class="form-control mb-2" accept="image/*">
+                    <button class="btn btn-custom w-100 mb-2" onclick="uploadMedical()" data-translate="uploadMedical">Upload Medical Report & Analyze</button>
+                    <div class="loading" id="medicalLoading" data-translate="processing">Processing...</div>
+                    <textarea id="medicalOutput" class="form-control" rows="5" placeholder="Medical Report Analysis Output"></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Combined Evaluation -->
+        <div class="card mt-4">
+            <h2 class="section-title" data-translate="combinedEvaluation">Combined Evaluation</h2>
+            <div class="row mb-3">
+                <div class="col-md-6 mb-2">
+                    <label for="modelSelect" class="form-label" data-translate="selectModel">Select Model:</label>
+                    <select id="modelSelect" class="form-select">
+                        <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile</option>
+                        <option value="deepseek-r1-distill-llama-70b">deepseek-r1-distill-llama-70b</option>
+                        <option value="llama-3.2-1b-preview">llama-3.2-1b-preview</option>
+                        <option value="qwen-2.5-32b">qwen-2.5-32b</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label for="languageSelect" class="form-label" data-translate="selectLanguage">Select Language:</label>
+                    <select id="languageSelect" class="form-select">
+                        <option value="English">English</option>
+                        <option value="Tamil">Tamil</option>
+                        <option value="Hindi">Hindi</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn btn-custom w-100 mb-2" onclick="evaluateCombined()" data-translate="evaluateCombined">Evaluate Combined Data</button>
+            <div class="loading" id="combinedLoading" data-translate="processing">Processing...</div>
+        </div>
+    </div>
+
+    <!-- Modal for Combined Evaluation -->
+    <div class="modal fade" id="resultModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content dark-mode-adaptive">
+                <div class="modal-header">
+                    <h5 class="modal-title" data-translate="combinedEvaluation">Combined Evaluation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea id="combinedOutput" class="form-control" rows="10" readonly></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-custom" data-bs-dismiss="modal" data-translate="close">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Language translations
+        const translations = {
+            English: {
+                title: "Nutritional & Medical Analysis Tool",
+                nutritionalData: "Nutritional Data",
+                uploadNutritional: "Upload Nutritional Image & Analyze",
+                medicalReport: "Medical Report",
+                uploadMedical: "Upload Medical Report & Analyze",
+                combinedEvaluation: "Combined Evaluation",
+                selectModel: "Select Model:",
+                selectLanguage: "Select Language:",
+                evaluateCombined: "Evaluate Combined Data",
+                processing: "Processing...",
+                close: "Close"
+            },
+            Tamil: {
+                title: "ஊட்டச்சத்து மற்றும் மருத்துவ பகுப்பாய்வு கருவி",
+                nutritionalData: "ஊட்டச்சத்து தரவு",
+                uploadNutritional: "ஊட்டச்சத்து படத்தை பதிவேற்றி பகுப்பாய்வு செய்",
+                medicalReport: "மருத்துவ அறிக்கை",
+                uploadMedical: "மருத்துவ அறிக்கையை பதிவேற்றி பகுப்பாய்வு செய்",
+                combinedEvaluation: "ஒருங்கிணைந்த மதிப்பீடு",
+                selectModel: "மாதிரியை தேர்ந்தெடு:",
+                selectLanguage: "மொழியை தேர்ந்தெடு:",
+                evaluateCombined: "ஒருங்கிணைந்த தரவை மதிப்பீடு செய்",
+                processing: "செயலாக்கம்...",
+                close: "மூடு"
+            },
+            Hindi: {
+                title: "पोषण और चिकित्सा विश्लेषण उपकरण",
+                nutritionalData: "पोषण डेटा",
+                uploadNutritional: "पोषण छवि अपलोड करें और विश्लेषण करें",
+                medicalReport: "चिकित्सा रिपोर्ट",
+                uploadMedical: "चिकित्सा रिपोर्ट अपलोड करें और विश्लेषण करें",
+                combinedEvaluation: "संयुक्त मूल्यांकन",
+                selectModel: "मॉडल चुनें:",
+                selectLanguage: "भाषा चुनें:",
+                evaluateCombined: "संयुक्त डेटा का मूल्यांकन करें",
+                processing: "प्रसंस्करण...",
+                close: "बंद करें"
+            }
+        };
+
+        // Theme toggle
+        function toggleTheme() {
+            const body = document.body;
+            const isDark = body.classList.toggle('dark-mode');
+            body.classList.toggle('light-mode', !isDark);
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.body.classList.add(`${savedTheme}-mode`);
+        if (savedTheme === 'dark') {
+            document.getElementById('themeToggle').checked = true;
+        }
+
+        // Language switcher
+        function updateLanguage() {
+            const lang = document.getElementById('languageSelectNav').value;
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                element.textContent = translations[lang][key];
+            });
+            localStorage.setItem('language', lang);
+        }
+
+        document.getElementById('languageSelectNav').addEventListener('change', updateLanguage);
+
+        // Load saved language
+        const savedLang = localStorage.getItem('language') || 'English';
+        document.getElementById('languageSelectNav').value = savedLang;
+        updateLanguage();
+
+        // Existing JavaScript functions with updated image handling
+        async function uploadNutritional() {
+            const fileInput = document.getElementById('nutritionalFile');
+            const loading = document.getElementById('nutritionalLoading');
+            const imageContainer = document.getElementById('imageContainer');
+            if (!fileInput.files[0]) {
+                alert("Please select a nutritional image first.");
+                return;
+            }
+            loading.style.display = 'block';
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            try {
+                const response = await fetch('/upload_nutritional', { method: 'POST', body: formData });
+                const data = await response.json();
+                loading.style.display = 'none';
+                if (!response.ok || data.error) {
+                    throw new Error(data.error || 'Unknown server error');
+                }
+                document.getElementById('nutritionalOutput').value = data.refined_text;
+                // Dynamically add or update image
+                let img = document.getElementById('imageDisplay');
+                if (!img) {
+                    img = document.createElement('img');
+                    img.id = 'imageDisplay';
+                    img.className = 'img-fluid mb-2';
+                    img.alt = 'Uploaded Nutritional Image';
+                    imageContainer.appendChild(img);
+                }
+                img.src = data.image_url;
+                img.style.display = 'block'; // Show image when uploaded
+            } catch (e) {
+                loading.style.display = 'none';
+                alert(`Error: ${e.message}`);
+            }
+        }
+
+        async function uploadMedical() {
+            const fileInput = document.getElementById('medicalFile');
+            const loading = document.getElementById('medicalLoading');
+            if (!fileInput.files[0]) {
+                alert("Please select a medical report image first.");
+                return;
+            }
+            loading.style.display = 'block';
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            try {
+                const response = await fetch('/upload_medical', { method: 'POST', body: formData });
+                const data = await response.json();
+                loading.style.display = 'none';
+                if (!response.ok || data.error) {
+                    throw new Error(data.error || 'Unknown server error');
+                }
+                document.getElementById('medicalOutput').value = data.refined_text;
+            } catch (e) {
+                loading.style.display = 'none';
+                alert(`Error: ${e.message}`);
+            }
+        }
+
+        async function evaluateCombined() {
+            const nutritionalText = document.getElementById('nutritionalOutput').value;
+            const medicalText = document.getElementById('medicalOutput').value;
+            const model = document.getElementById('modelSelect').value;
+            const language = document.getElementById('languageSelect').value;
+            const loading = document.getElementById('combinedLoading');p
+
+            if (!nutritionalText) {
+                alert("Please analyze nutritional data first.");
+                return;
+            }
+            if (!medicalText) {
+                alert("Please process medical report first.");
+                return;
+            }
+
+            loading.style.display = 'block';
+            try {
+                const response = await fetch('/evaluate_combined', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nutritional_text: nutritionalText, medical_text: medicalText, model, language })
+                });
+                const data = await response.json();
+                loading.style.display = 'none';
+                if (!response.ok || data.error) {
+                    throw new Error(data.error || 'Unknown server error');
+                }
+                document.getElementById('combinedOutput').value = data.result;
+                new bootstrap.Modal(document.getElementById('resultModal')).show();
+            } catch (e) {
+                loading.style.display = 'none';
+                alert(`Error: ${e.message}`);
+            }
+        }
+    </script>
+</body>
+</html>
