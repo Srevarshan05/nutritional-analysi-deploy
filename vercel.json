@@ -1,0 +1,19 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "ollama_ocr.py",         
+        "use": "@vercel/python"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",                
+        "dest": "/"                    
+      }
+    ],
+    "env": {
+      "SECRET_KEY": "@secret_key",     
+      "GROQ_API_KEY": "@groq_api_key"  
+    }
+  }
