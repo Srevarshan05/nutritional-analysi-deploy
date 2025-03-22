@@ -13,7 +13,12 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 app = Flask(__name__)
 
 # Load environment variables
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-secret-key-for-local')  # Flask security key
+# Load SECRET_KEY from environment variables
+SECRET_KEY = os.environ.get('SECRET_KEY')
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY environment variable is not set!")
+
+app.config['SECRET_KEY'] = SECRET_KEY
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY')  # Groq API key from environment variable
 
 try:
